@@ -6,12 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.jesse.baselibs.mvp.IBaseView
-import com.jesse.baselibs.mvp.IModel
 import com.jesse.baselibs.mvp.PresenterDispatch
 import com.jesse.baselibs.mvp.PresenterProviders
 import com.trello.rxlifecycle2.components.support.RxFragment
 
-abstract class BaseMvpFragment<P : BasePresenter<IModel, IBaseView>> : RxFragment(), IBaseView {
+abstract class BaseMvpFragment: RxFragment(), IBaseView {
 
     private var mContentView: View? = null
 
@@ -40,21 +39,13 @@ abstract class BaseMvpFragment<P : BasePresenter<IModel, IBaseView>> : RxFragmen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mPresenterDispatch.attachView<BasePresenter<IModel, IBaseView>>(this)
+        mPresenterDispatch.attachView<BasePresenter<IBaseView>>(this)
         init(savedInstanceState)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mPresenterDispatch.detachView<BasePresenter<IModel, IBaseView>>()
-    }
-
-    protected fun getPresenter(): P {
-        return mPresenterProviders.getPresenter(0)
-    }
-
-    fun getPresenterProviders(): PresenterProviders {
-        return mPresenterProviders
+        mPresenterDispatch.detachView<BasePresenter<IBaseView>>()
     }
 
     /**

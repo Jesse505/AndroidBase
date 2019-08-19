@@ -1,7 +1,6 @@
 package com.jesse.baselibs.base
 
 import com.jesse.baselibs.mvp.IBaseView
-import com.jesse.baselibs.mvp.IModel
 import com.jesse.baselibs.mvp.IPresenter
 import com.trello.rxlifecycle2.LifecycleTransformer
 import com.trello.rxlifecycle2.android.ActivityEvent
@@ -10,34 +9,24 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.components.support.RxFragment
 import java.lang.IllegalArgumentException
 
-abstract class BasePresenter<M : IModel, V : IBaseView> : IPresenter<V> {
+abstract class BasePresenter<V : IBaseView> : IPresenter<V> {
 
-    var mRootView: V? = null
+    var mView: V? = null
         private set
 
-    val model: M by lazy {
-        createModel()
-    }
-
-    abstract fun createModel(): M
-
-    override fun attachView(mRootView: V) {
-        this.mRootView = mRootView
+    override fun attachView(rootView: V) {
+        this.mView = rootView
     }
 
 
     override fun detachView() {
-        mRootView = null
-    }
-
-    fun onCleared() {
-
+        mView = null
     }
 
     fun <VT> bindToLifecycle(): LifecycleTransformer<VT> {
-        return when (mRootView) {
-            is RxFragment -> (mRootView as RxFragment).bindToLifecycle()
-            is RxAppCompatActivity -> (mRootView as RxAppCompatActivity).bindToLifecycle()
+        return when (mView) {
+            is RxFragment -> (mView as RxFragment).bindToLifecycle()
+            is RxAppCompatActivity -> (mView as RxAppCompatActivity).bindToLifecycle()
             else -> throw IllegalArgumentException("class must extents RxAppCompatActivity or RxFragment")
         }
     }
@@ -48,7 +37,7 @@ abstract class BasePresenter<M : IModel, V : IBaseView> : IPresenter<V> {
      * 缺点：需要对所有需要的声明周期，都需要进行封装
      */
     fun <VT> bindUntilOnDestroyEvent(): LifecycleTransformer<VT> {
-        if (mRootView is RxFragment) {
+        if (mView is RxFragment) {
             return bindFragmentUntilEvent(FragmentEvent.DESTROY)
         }
         return bindActivityUntilEvent(ActivityEvent.DESTROY)
@@ -60,8 +49,8 @@ abstract class BasePresenter<M : IModel, V : IBaseView> : IPresenter<V> {
      * 缺点：当Presenter对应的UI的类型(比如Activity或Fragment)切换时，需要修改对应的Presenter
      */
     fun <VT> bindActivityUntilEvent(event: ActivityEvent): LifecycleTransformer<VT> {
-        return when (mRootView) {
-            is RxAppCompatActivity -> (mRootView as RxAppCompatActivity).bindUntilEvent(event)
+        return when (mView) {
+            is RxAppCompatActivity -> (mView as RxAppCompatActivity).bindUntilEvent(event)
             else -> throw IllegalArgumentException("class must extents RxAppCompatActivity")
         }
     }
@@ -70,8 +59,8 @@ abstract class BasePresenter<M : IModel, V : IBaseView> : IPresenter<V> {
      * 绑定 RxFragment 指定的声明周期
      */
     fun <VT> bindFragmentUntilEvent(event: FragmentEvent): LifecycleTransformer<VT> {
-        return when (mRootView) {
-            is RxAppCompatActivity -> (mRootView as RxFragment).bindUntilEvent(event)
+        return when (mView) {
+            is RxAppCompatActivity -> (mView as RxFragment).bindUntilEvent(event)
             else -> throw IllegalArgumentException("class must extents RxFragment")
         }
     }
