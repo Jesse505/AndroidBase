@@ -2,8 +2,8 @@
 <template
     format="5"
     revision="5"
-    name="Mvp Activity"
-    description="Creates a new Mvp Activity"
+    name="Mvp Fragment"
+    description="Creates a new  Mvp Fragment"
     minApi="9"
     minBuildApi="14">
 
@@ -12,18 +12,18 @@
 
     <parameter
         id="activityName"
-        name="Activity Name"
+        name="Fragment Name"
         type="string"
         constraints="class|nonempty"
         suggest="${layoutToActivity(layoutName)}"
-        help="default End of Activity" />
+        help="default End of Fragment" />
     <parameter
         id="activityLayout"
-        name="Activity Layout Name"
+        name="Fragment Layout Name"
         type="string"
         constraints="layout|nonempty"
-        suggest="${activityToLayout(activityName)}"
-        help="The name of the layout to create for the activity" />
+        suggest="fragment_${classToResource(activityName)}"
+        help="The name of the layout to create for the Fragment" />
 
     <parameter
         id="contractName"
